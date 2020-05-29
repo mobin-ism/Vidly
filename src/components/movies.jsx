@@ -7,6 +7,8 @@ import { paginate } from "../utils/paginate";
 import _ from "lodash";
 import swal from "sweetalert";
 import MoviesTable from "./moviesTable";
+import Like from "./common/like";
+import Navbar from "./navbar";
 
 class Movies extends Component {
   state = {
@@ -16,7 +18,6 @@ class Movies extends Component {
     currentPage: 1,
     currentGenre: "all",
     sortedColumn: { path: "title", order: "asc" },
-    columns: [{ label: "", path: "" }],
   };
 
   componentDidMount() {
@@ -24,8 +25,8 @@ class Movies extends Component {
     this.setState({ movies: getMovies(), genres });
   }
 
-  handleDelete = (id) => {
-    const movies = this.state.movies.filter((m) => m._id !== id);
+  handleDelete = (movie) => {
+    const movies = this.state.movies.filter((m) => m._id !== movie._id);
     this.setState({ movies });
   };
 
@@ -77,39 +78,42 @@ class Movies extends Component {
   }
 
   render() {
+    const { genres, currentGenre, sortedColumn, pageSize } = this.state;
     return (
-      <main className="container">
-        <div className="row m-5">
-          <div className="col-3">
-            <ListGroup
-              items={this.state.genres}
-              onItemSelect={this.handleOnItemSelect}
-              currentItem={this.state.currentGenre}
-              valueProperty="_id"
-              textProperty="name"
-            />
-          </div>
-          <div className="col-9">
-            <div className="row m-1">
-              <h4>{this.numberOfMovies()}</h4>
+      <React.Fragment>
+        <main className="container">
+          <div className="row m-5">
+            <div className="col-3">
+              <ListGroup
+                items={genres}
+                onItemSelect={this.handleOnItemSelect}
+                currentItem={currentGenre}
+                valueProperty="_id"
+                textProperty="name"
+              />
             </div>
-            <MoviesTable
-              onSort={this.handleSort}
-              onLike={this.handleLike}
-              onDelete={this.handleDelete}
-              movies={this.paginateMovies()}
-              sortedColumn={this.state.sortedColumn}
-            />
-            <Pagination
-              // THIS LIST WILL GET GENERATED AFTER FILTERING AND SORTING
-              totalItems={this.getMovieList().length}
-              pageSize={this.state.pageSize}
-              onPageChange={this.handlePageChange}
-              currentPage={this.state.currentPage}
-            />
+            <div className="col-9">
+              <div className="row m-1">
+                <h4>{this.numberOfMovies()}</h4>
+              </div>
+              <MoviesTable
+                onSort={this.handleSort}
+                onLike={this.handleLike}
+                onDelete={this.handleDelete}
+                movies={this.paginateMovies()}
+                sortedColumn={sortedColumn}
+              />
+              <Pagination
+                // THIS LIST WILL GET GENERATED AFTER FILTERING AND SORTING
+                totalItems={this.getMovieList().length}
+                pageSize={pageSize}
+                onPageChange={this.handlePageChange}
+                currentPage={this.state.currentPage}
+              />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </React.Fragment>
     );
   }
 
